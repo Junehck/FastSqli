@@ -57,30 +57,21 @@ foreach($replace as $k=>$v)
 	$id=str_ireplace($v,'',$id);
 }
 
+$sql="select * from sqli_data where id=$id order by id limit 1";
 /*注入方法实现*/
-if($error)
-{
-	$sql="select * from sqli_data where id=$id order by id limit 1";
+if($error){
 	mysqli_query($conn,$sql) or die( mysqli_error($conn));
-}elseif($bool)
-{
-	$sql="select * from sqli_data where id=$id order by id limit 1";
+}elseif($bool){
 	echo getRow($sql,$conn) ? 'ok' : 'no';
-}elseif($time)
-{
-	$sql="select * from sqli_data where id=$id order by id limit 1";
+}elseif($time){
 	mysqli_query($conn,$sql);
-}elseif($union)
-{
-	$sql="select * from sqli_data where id=$id order by id limit 1";
+}elseif($union){
 	$result=getRow($sql,$conn);
 	echo $result['title'].'<hr>'.$result['content'].'<hr>';
 }elseif($stacked){
-	$sql="select * from sqli_data where id=$id order by id limit 1";
 	$result=getRow_s($sql,$conn);
 	echo $result['title'].'<hr>'.$result['content'].'<hr>';
-}else
-{
+}else{
 	echo '未选择注入方式';
 }
 
