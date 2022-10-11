@@ -1,5 +1,6 @@
 <?php
 header("Content-Type:text/html;charset=utf-8");
+error_reporting(E_ALL^E_NOTICE^E_WARNING);
 
 /*数据库配置信息*/
 $db_host='localhost';
@@ -17,6 +18,7 @@ $error=0;   //报错
 $bool=0;    //布尔
 $time=0;	//时间
 $union=1;   //联合
+$stacked=0; //堆叠注入
 
 /*拦截规则(正则)无视大小写*/
 $filter="";
@@ -29,15 +31,16 @@ $conn=mysqli_connect($db_host,$db_username,$db_password,$db_dbname,$db_port);
 $conn or die("连接错误: " . mysqli_connect_error());
 
 /*判断表是否存在*/
-$sql="select count(table_name) as status from information_schema.tables where table_schema='sqli_data' and TABLE_NAME=database()";
+$sql="select count(table_name) as status from information_schema.tables where table_schema='{$db_dbname}' and TABLE_NAME='sqli_data'";  
 $result=getRow($sql,$conn);
 
 /*新建数据表并插入数据*/
 if($result['status']<1)
 {
     $sql="CREATE TABLE `sqli_data` ( `id` INT NOT NULL AUTO_INCREMENT , `title` VARCHAR(32) NOT NULL , `content` TEXT NOT NULL , PRIMARY KEY (`id`)) ENGINE = MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;";
+	$flagid=mt_rand(1111111111,9999999999);
     if(mysqli_query($conn,$sql))
-		mysqli_query($conn,"insert into sqli_data(`id`,`title`,`content`) values(1,'女生把90多张卖萌自拍错发班级群','钟同学称，当时和朋友在逛街，看到班级群来了消息准备点进去填表格，刚好朋友又一直在催她发照片，就不小心把照片都发出去了，当时感觉特别崩溃，站在大街上大叫了好几次'),(2,'银比金坚!中国女篮获世界杯亚军','北京时间10月1日，2022女篮世界杯的决赛在悉尼上演，中国女篮61-83不敌美国女篮，获得本届世界杯的亚军。'),(3,'一个博客','blog.mo60.cn')");
+		mysqli_query($conn,"insert into sqli_data(`id`,`title`,`content`) values(1,'女生把90多张卖萌自拍错发班级群','钟同学称，当时和朋友在逛街，看到班级群来了消息准备点进去填表格，刚好朋友又一直在催她发照片，就不小心把照片都发出去了，当时感觉特别崩溃，站在大街上大叫了好几次'),(2,'银比金坚!中国女篮获世界杯亚军','北京时间10月1日，2022女篮世界杯的决赛在悉尼上演，中国女篮61-83不敌美国女篮，获得本届世界杯的亚军。'),(3,'一个博客','YmxvZy5tbzYwLmNu'),({$flagid},'flag','flag{cd441b3ca90ff269074808874ff040b5}')");
 }
 
 
@@ -62,7 +65,7 @@ if($error)
 }elseif($bool)
 {
 	$sql="select * from sqli_data where id=$id order by id limit 1";
-	echo getRow($sql,$conn) ? 'ok' : 'no' ;
+	echo getRow($sql,$conn) ? 'ok' : 'no';
 }elseif($time)
 {
 	$sql="select * from sqli_data where id=$id order by id limit 1";
@@ -71,6 +74,10 @@ if($error)
 {
 	$sql="select * from sqli_data where id=$id order by id limit 1";
 	$result=getRow($sql,$conn);
+	echo $result['title'].'<hr>'.$result['content'].'<hr>';
+}elseif($stacked){
+	$sql="select * from sqli_data where id=$id order by id limit 1";
+	$result=getRow_s($sql,$conn);
 	echo $result['title'].'<hr>'.$result['content'].'<hr>';
 }else
 {
@@ -88,5 +95,20 @@ function getRow($sql,$conn)
     $result=mysqli_query($conn,$sql);
     return mysqli_fetch_assoc($result);
 }
+
+function getRow_s($sql,$conn)
+{
+    if (mysqli_multi_query($conn, $sql))
+	{
+		if ($result = mysqli_store_result($conn))
+		{
+			if($row = mysqli_fetch_assoc($result))
+			{
+				return $row;
+			}
+		}
+	}	
+}
+
 
 ?>
