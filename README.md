@@ -1,12 +1,20 @@
 # FastSqli
 
-单页mysql注入环境自带数据仅需填账号密码，自定义过滤/拦截规则进行bypass等测试，支持报错/联合/延时/布尔
+单页mysql注入环境自带数据仅需填账号密码无需其他复杂配置开箱即用。
+自定义过滤/拦截规则进行bypass等测试，支持报错/联合/延时/布尔/时间/堆叠 的数值或字符注入
 
 # 使用演示
 
-选择注入类型
+支持注入类型
 
-![image](https://user-images.githubusercontent.com/103053746/193574155-2d810daf-4e0a-4967-b383-c4238ea3f7bc.png)
+* 报错
+* 布尔
+* 时间
+* 联合
+* 堆叠
+
+![image](https://user-images.githubusercontent.com/103053746/205206924-5f042c21-15e5-49c1-aea8-c2717b4ffce6.png)
+
 
 
 自定义正则拦截规则,方便进行bypass等一系列测试
@@ -20,4 +28,4 @@
 
 也支持debug信息查看数据库语句以及报错信息,方便查看到后端语句情况
 
-![image](https://user-images.githubusercontent.com/103053746/193575217-ab187879-461b-46bf-bd9f-26143870aa23.png)
+![image](https://user-images.githubusercontent.com/103053746/205206783-57110a31-0097-4d08-9b8e-7302744f7a2b.png)
